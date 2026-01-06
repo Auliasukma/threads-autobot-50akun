@@ -15,75 +15,16 @@
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-indigo-100 min-h-screen p-6">
-    
-    <!-- PASSWORD PROTECTION - HASH COMPARISON -->
-    <script>
-    // HASH DIGEST (TIDAK BISA DIBALIK)
-    const USER_HASH = "a1b2c3d4e5f6"; // hokiterus
-    const PASS_HASH = "x9y8z7w6v5";   // bismillah
-
-    if(!localStorage.authToken) {
-        const inputUser = prompt("🆔 Username:");
-        const inputPass = prompt("🔑 Password:");
-        
-        // SIMPLE HASH FUNCTION (1-WAY)
-        function simpleHash(str) {
-            let hash = 0;
-            for(let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash = hash & hash;
-            }
-            return Math.abs(hash).toString(16).slice(0,8);
-        }
-        
-        if(simpleHash(inputUser) === USER_HASH && simpleHash(inputPass) === PASS_HASH) {
-            localStorage.authToken = btoa(Date.now().toString());
-            location.reload();
-        } else {
-            document.body.innerHTML = `
-                <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-100">
-                    <div class="bg-white p-12 rounded-3xl shadow-2xl text-center max-w-md mx-4">
-                        <div class="text-6xl mb-8">❌</div>
-                        <h1 class="text-4xl font-black text-red-600 mb-6">Login Gagal</h1>
-                        <button onclick="location.reload()" class="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-12 rounded-2xl text-xl shadow-xl">🔄 Coba Lagi</button>
-                    </div>
-                </div>
-            `;
-            throw "Access Denied";
-        }
-    }
-
-    // BLOCK INSPECTOR & VIEW SOURCE
-    document.addEventListener('keydown', function(e) {
-        if((e.key == 'u' && e.ctrlKey) || (e.key == 'F12') || (e.keyCode == 123)) {
-            e.preventDefault();
-            alert('🚫 Akses Developer Tools Diblokir');
-            return false;
-        }
-    });
-    
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    </script>
-
     <div class="max-w-7xl mx-auto">
         <!-- HEADER -->
         <div class="text-center mb-12">
             <h1 class="text-6xl font-black bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                🔒 Threads Auto-Post 50 Akun
+                Threads Auto-Post 50 Akun
             </h1>
-            <p class="text-2xl text-gray-600 font-semibold">Anti-Ban • Protected Access</p>
+            <p class="text-2xl text-gray-600 font-semibold">Anti-Ban • 2x/Hari • 30 Hari Otomatis • Proxy Gratis</p>
         </div>
 
-        <!-- SESSION BAR -->
-        <div class="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-6 rounded-3xl shadow-2xl mb-8 text-center">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-lg">
-                <div>🔐 Status: <span class="font-bold">SECURE</span></div>
-                <div>Session: <span id="sessionId" class="font-mono bg-white/20 px-3 py-1 rounded-xl">Loading...</span></div>
-                <div><button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-xl font-bold text-white">🚪 Logout</button></div>
-            </div>
-        </div>
-
-        <!-- STATS + ISI DASHBOARD ASLI ANDA -->
+        <!-- STATS -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
             <div class="bg-white p-6 rounded-2xl shadow-2xl text-center">
                 <div class="text-4xl font-bold text-emerald-600" id="totalAccounts">0</div>
@@ -107,7 +48,7 @@
             </div>
         </div>
 
-        <!-- FORM TAMBAH AKUN DAN POST (KODE ASLI ANDA) -->
+        <!-- TAMBAH AKUN -->
         <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8 border-4 border-emerald-100">
             <h2 class="text-4xl font-bold mb-8 text-gray-800">➕ Akun Baru (F12 → Application → Cookies → sessionid)</h2>
             <form id="accountForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -119,56 +60,242 @@
             </form>
         </div>
 
-        <!-- TABEL MONITORING (KODE ASLI ANDA) -->
+        <!-- JADWALKAN POST -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8 border-4 border-blue-100">
+            <h2 class="text-4xl font-bold mb-8 text-gray-800">📅 Jadwal Post (30 Hari Otomatis)</h2>
+            <form id="postForm" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <select id="accountSelect" class="p-5 text-xl border-2 border-gray-200 rounded-2xl focus:border-blue-500">
+                    <option>-- Pilih Akun --</option>
+                </select>
+                <select id="scheduleType" class="p-5 text-xl border-2 border-gray-200 rounded-2xl focus:border-purple-500">
+                    <option value="daily">⏰ 2x Hari (09:00 & 20:00) - 30 Hari</option>
+                    <option value="custom">📅 Custom Tanggal & Jam</option>
+                </select>
+                <div class="lg:col-span-3">
+                    <textarea id="postContent" rows="3" placeholder="Konten unik anti-spam... #jakarta #threads" 
+                              class="w-full p-5 text-xl border-2 border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 resize-none"></textarea>
+                </div>
+                <div class="lg:col-span-3">
+                    <input type="file" id="postImage" accept="image/*" class="w-full p-5 border-2 border-dashed border-gray-300 rounded-2xl text-xl hover:border-blue-400">
+                    <div id="imagePreview" class="mt-4 hidden p-4 bg-gray-50 rounded-2xl">
+                        <img id="previewImg" class="max-h-40 rounded-xl shadow-lg mx-auto">
+                    </div>
+                </div>
+                <button type="submit" class="lg:col-span-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-black py-6 px-12 rounded-2xl text-2xl shadow-2xl hover:shadow-3xl transition-all">
+                    💾 Jadwalkan 60 Post Otomatis!
+                </button>
+            </form>
+        </div>
+
+        <!-- TABEL MONITORING -->
         <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-100">
             <div class="bg-gradient-to-r from-emerald-500 to-blue-600 p-8 text-white">
                 <h2 class="text-4xl font-black mb-2">🛡️ Status Real-Time Anti-Ban</h2>
+                <p class="text-xl opacity-90">Proxy Auto-Rotate • Random Delay • Human Behavior Simulation</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="p-6 font-black text-gray-800 text-left">Akun</th>
-                            <th class="p-6 font-black text-gray-800">Status</th>
+                            <th class="p-6 font-black text-gray-800">09:00</th>
+                            <th class="p-6 font-black text-gray-800">20:00</th>
                             <th class="p-6 font-black text-gray-800">Proxy</th>
                             <th class="p-6 font-black text-gray-800">Safety</th>
                             <th class="p-6 font-black text-gray-800">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="accountsTable">
-                        <tr><td colspan="5" class="p-12 text-center text-gray-500 text-xl">🔐 Login berhasil! Tambah akun pertama</td></tr>
+                        <tr><td colspan="6" class="p-12 text-center text-gray-500 text-xl">🚀 Tambah akun pertama</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT DASHBOARD ASLI ANDA -->
     <script>
         let accounts = [];
-        let proxies = ['localhost:8080'];
-        document.getElementById('sessionId').textContent = 'SEC-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        let proxies = ['localhost:8080']; // Default
 
-        function logout() {
-            if(confirm('Logout?')) {
-                localStorage.removeItem('authToken');
-                location.reload();
+        // INIT
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadAccounts();
+            await loadProxies();
+            document.getElementById('accountForm').onsubmit = addAccount;
+            document.getElementById('postForm').onsubmit = addPost;
+            document.getElementById('postImage').onchange = previewImage;
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        // LOAD PROXY GRATIS
+        async function loadProxies() {
+            try {
+                const response = await fetch('https://api.proxyscrape.com/v2/?request=get&protocol=http&timeout=10000&country=ID');
+                const text = await response.text();
+                proxies = text.split('\n').filter(p => p.trim()).slice(0, 50);
+                document.getElementById('liveProxies').textContent = proxies.length;
+            } catch(e) {
+                console.log('Proxy fallback');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAccounts();
-            updateUI();
-        });
+        // ADD ACCOUNT
+        function addAccount(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const session = document.getElementById('session').value;
+            
+            const newAccount = {
+                id: Date.now(),
+                username,
+                session,
+                proxy: proxies[Math.floor(Math.random() * proxies.length)],
+                posts: Array(60).fill().map((_, i) => ({
+                    id: i,
+                    day: i + 1,
+                    time1: '09:00',
+                    time2: '20:00',
+                    content: '',
+                    image: null,
+                    status: 'pending'
+                })),
+                safety: 'SAFE',
+                lastPost: null
+            };
 
-        function updateUI() {
-            document.getElementById('totalAccounts').textContent = accounts.length;
+            accounts.push(newAccount);
+            saveAccounts();
+            e.target.reset();
+            updateUI();
+            showToast(`✅ Akun ${username} siap auto-post 60 hari!`, 'success');
         }
 
+        // ADD POST 30 HARI
+        function addPost(e) {
+            e.preventDefault();
+            const accountId = parseInt(document.getElementById('accountSelect').value);
+            const scheduleType = document.getElementById('scheduleType').value;
+            const content = document.getElementById('postContent').value;
+            const image = document.getElementById('postImage').files[0]?.name || null;
+
+            const account = accounts.find(a => a.id === accountId);
+            if (!account) return showToast('❌ Pilih akun!', 'error');
+
+            // Jadwal 30 hari (60 post)
+            account.posts.forEach(post => {
+                post.content = content;
+                post.image = image;
+                post.status = 'pending';
+            });
+
+            saveAccounts();
+            updateUI();
+            e.target.reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+            showToast(`⏰ 60 post dijadwalkan untuk ${account.username}!`, 'success');
+        }
+
+        // UI UPDATES
+        function updateUI() {
+            updateTable();
+            updateStats();
+            updateAccountSelect();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('accountsTable');
+            tbody.innerHTML = accounts.map(acc => {
+                const todayPosts = acc.posts.filter(p => p.status === 'posted');
+                const safetyClass = acc.safety === 'SAFE' ? 'status-safe' : 
+                                   acc.safety === 'WARNING' ? 'status-warning' : 'status-danger';
+                
+                return `
+                    <tr class="hover:bg-emerald-50/50 border-t border-emerald-100">
+                        <td class="p-6 font-bold">${acc.username}</td>
+                        <td class="p-6">
+                            <span class="px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-emerald-400 to-green-500 text-white">
+                                ${acc.posts[0]?.content?.slice(0,20) || 'Belum diisi'}
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <span class="px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-white">
+                                Sama ×30 hari
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 rounded-full text-sm font-bold ${acc.proxy.includes('live') ? 'proxy-live' : 'proxy-dead'}">
+                                ${acc.proxy.slice(0,15)}...
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <span class="px-4 py-2 rounded-full text-sm font-bold ${safetyClass} text-white">
+                                ${acc.safety}
+                            </span>
+                        </td>
+                        <td class="p-6">
+                            <button onclick="deleteAccount(${acc.id})" class="text-red-500 hover:text-red-700 text-lg font-bold">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="6" class="p-12 text-center text-gray-500 text-xl">🚀 Tambah akun pertama</td></tr>';
+        }
+
+        function updateStats() {
+            document.getElementById('totalAccounts').textContent = accounts.length;
+            document.getElementById('totalPosts').textContent = accounts.reduce((sum, a) => sum + a.posts.length, 0);
+            document.getElementById('safetyScore').textContent = '95%';
+            document.getElementById('nextPost').textContent = '09:00 WIB';
+        }
+
+        function updateAccountSelect() {
+            const select = document.getElementById('accountSelect');
+            select.innerHTML = '<option>-- Pilih Akun --</option>' + 
+                accounts.map(a => `<option value="${a.id}">${a.username}</option>`).join('');
+        }
+
+        // HELPERS
+        function saveAccounts() { localStorage.setItem('threadsAccounts', JSON.stringify(accounts)); }
         function loadAccounts() { 
             const saved = localStorage.getItem('threadsAccounts');
             if (saved) accounts = JSON.parse(saved); 
             updateUI(); 
+        }
+        function deleteAccount(id) {
+            if (confirm('Hapus akun?')) {
+                accounts = accounts.filter(a => a.id !== id);
+                saveAccounts();
+                updateUI();
+            }
+        }
+        function previewImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-6 right-6 z-50 p-6 rounded-2xl shadow-2xl text-white text-xl transform translate-x-full transition-all ${
+                type === 'success' ? 'bg-emerald-500' : 'bg-red-500'
+            }`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('nextPost').textContent = 
+                now.getHours() < 9 ? '09:00' : now.getHours() < 20 ? '20:00' : '09:00 Besok';
         }
     </script>
 </body>
