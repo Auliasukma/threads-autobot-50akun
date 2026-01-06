@@ -3,142 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Threads 50 Akun Dashboard</title>
+    <title>Threads 50 Akun Dashboard - GitHub Pages</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-safe { background: linear-gradient(45deg, #10b981, #059669); }
+        .status-warning { background: linear-gradient(45deg, #f59e0b, #d97706); }
+        body.locked { overflow: hidden; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-    
-    <!-- LOGIN SIMPEL -->
-    <div id="loginScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔐 Login</h2>
-            <input type="text" id="userInput" placeholder="Username" class="w-full p-4 border rounded-lg mb-4">
-            <input type="password" id="passInput" placeholder="Password" class="w-full p-4 border rounded-lg mb-6">
-            <button onclick="login()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold">Masuk</button>
-        </div>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4 md:p-8">
+
+<!-- LOGIN -->
+<div id="loginScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center hidden">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔐 Threads Dashboard</h2>
+        <input type="text" id="userInput" placeholder="Username" class="w-full p-4 border rounded-lg mb-4 text-lg">
+        <input type="password" id="passInput" placeholder="Password" class="w-full p-4 border rounded-lg mb-6 text-lg">
+        <button onclick="login()" class="w-full bg-green-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-600">✅ Masuk</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="max-w-4xl mx-auto hidden">
+    <!-- HEADER -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent mb-4">
+            Threads 50 Akun Auto-Post
+        </h1>
+        <p class="text-xl text-gray-600 mb-4">Anti-Ban • GitHub Actions • PC Mati OK</p>
+        <button onclick="logout()" class="bg-red-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-600">🚪 Logout</button>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="max-w-4xl mx-auto hidden">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent mb-4">
-                Threads 50 Akun Auto-Post
-            </h1>
-            <button onclick="logout()" class="bg-red-500 text-white px-6 py-2 rounded-lg font-bold">Logout</button>
-        </div>
+    <!-- STATS -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8 p-6 bg-white rounded-2xl shadow-xl">
+        <div class="text-center"><div id="totalAccounts" class="text-3xl font-bold text-green-600">0</div><div>Akun Aktif</div></div>
+        <div class="text-center"><div id="totalPosts" class="text-3xl font-bold text-blue-600">0</div><div>Post Otomatis</div></div>
+        <div class="text-center"><div id="nextPost" class="text-2xl font-bold text-purple-600">20:00 WIB</div><div>Selanjutnya</div></div>
+        <div class="text-center"><div id="safetyScore" class="text-3xl font-bold text-orange-600">95%</div><div>Safety</div></div>
+        <div class="text-center"><div id="syncStatus" class="text-lg font-bold text-gray-700">Siap Sync</div><div>GitHub Secrets</div></div>
+    </div>
 
-        <!-- STATS -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 p-6 bg-white rounded-2xl shadow-xl">
-            <div class="text-center"><div id="totalAccounts" class="text-3xl font-bold text-green-600">0</div><div>Akun</div></div>
-            <div class="text-center"><div id="totalPosts" class="text-3xl font-bold text-blue-600">0</div><div>Posts</div></div>
-            <div class="text-center"><div id="nextPost" class="text-3xl font-bold text-purple-600">20:00</div><div>Selanjutnya</div></div>
-            <div class="text-center"><div id="safetyScore" class="text-3xl font-bold text-orange-600">95%</div><div>Safety</div></div>
-            <div class="text-center"><div id="statusLog" class="text-xl text-gray-700">Siap</div><div>Status</div></div>
-        </div>
-
-        <!-- TAMBAH AKUN -->
-        <div class="bg-white p-8 rounded-2xl shadow-2xl mb-8 border-2 border-green-100">
-            <h3 class="text-2xl font-bold mb-6">➕ Tambah Akun Threads</h3>
-            <form id="accountForm" class="space-y-4">
+    <!-- TAMBAH AKUN -->
+    <div class="bg-white p-8 rounded-2xl shadow-2xl mb-8 border-2 border-green-100">
+        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+            ➕ Tambah Akun Threads 
+            <span class="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">Kiwi Browser F12 → sessionid</span>
+        </h3>
+        <form id="accountForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-lg font-bold mb-3">👤 Username</label>
                 <input type="text" id="username" placeholder="akun1_threads" class="w-full p-4 border rounded-lg text-lg" required>
+            </div>
+            <div>
+                <label class="block text-lg font-bold mb-3">🔑 Session Token</label>
                 <input type="text" id="session" placeholder="sessionid=eyJhbGciOiJIUzI1NiIs..." class="w-full p-4 border rounded-lg text-lg" required>
-                <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-8 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl">🚀 Tambah Akun</button>
-            </form>
-        </div>
+            </div>
+            <button type="submit" class="md:col-span-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-8 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl">🚀 Tambah Akun Anti-Ban</button>
+        </form>
+    </div>
 
-        <!-- AKUN LIST -->
-        <div class="bg-white rounded-2xl shadow-2xl p-6 border-2 border-blue-100">
-            <h3 class="text-xl font-bold mb-4">📋 Daftar Akun (0)</h3>
-            <div id="accountsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+    <!-- GITHUB SECRETS SYNC -->
+    <div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-8 rounded-2xl shadow-2xl mb-8 border-4 border-green-200">
+        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">🔄 GitHub Secrets Auto-Sync</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button onclick="syncToGitHubSecrets()" class="bg-white text-green-600 font-black py-6 px-8 rounded-2xl shadow-xl hover:shadow-2xl hover:bg-green-50 text-xl">
+                🚀 SYNC AKUN → GITHUB SECRETS
+            </button>
+            <button onclick="copyGitHubSecret()" class="bg-white text-blue-600 font-black py-6 px-8 rounded-2xl shadow-xl hover:shadow-2xl hover:bg-blue-50 text-xl">
+                📋 COPY JSON SECRETS
+            </button>
+            <div id="syncPreview" class="bg-white p-4 rounded-2xl text-center font-bold text-sm bg-opacity-90">
+                Tambah akun dulu → Sync otomatis
+            </div>
         </div>
     </div>
 
-    <script>
-        // LOGIN - GANTI SESUKA
-        const USERS = { 'admin': 'threads2026', 'threads': '50akun' };
+    <!-- AKUN LIST -->
+    <div class="bg-white rounded-2xl shadow-2xl p-6 border-2 border-blue-100">
+        <h3 class="text-xl font-bold mb-4 flex items-center gap-3">
+            📋 Daftar Akun Aktif (<span id="accountsCount">0</span>)
+        </h3>
+        <div id="accountsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+    </div>
+</div>
+
+<script>
+    // LOGIN - GANTI SESUKA HATI DI SINI!
+    const USERS = { 
+        'admin': 'threads2026',     // ← GANTI USERNAME/PASSWORD
+        'threads': '50akun',
+        'bos': 'bos123'
+    };
+    
+    // INIT
+    let accounts = JSON.parse(localStorage.getItem('threadsAccounts')) || [];
+    
+    if (!localStorage.getItem('dashboardLoggedIn')) {
+        document.getElementById('loginScreen').classList.remove('hidden');
+    } else {
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadAccounts();
+    }
+
+    // LOGIN
+    function login() {
+        const user = document.getElementById('userInput').value;
+        const pass = document.getElementById('passInput').value;
         
-        // CHECK LOGIN
-        if (!localStorage.getItem('dashboardLoggedIn')) {
-            document.getElementById('loginScreen').classList.remove('hidden');
-        } else {
+        if (USERS[user] && USERS[user] === pass) {
+            localStorage.setItem('dashboardLoggedIn', 'true');
+            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             loadAccounts();
+        } else {
+            alert('❌ Username/password salah!');
+            document.getElementById('userInput').value = '';
+            document.getElementById('passInput').value = '';
         }
+    }
 
-        function login() {
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-            
-            if (USERS[user] && USERS[user] === pass) {
-                localStorage.setItem('dashboardLoggedIn', 'true');
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                loadAccounts();
-            } else {
-                alert('❌ Username/password salah!');
-            }
-        }
+    function logout() {
+        localStorage.removeItem('dashboardLoggedIn');
+        location.reload();
+    }
 
-        function logout() {
-            localStorage.removeItem('dashboardLoggedIn');
-            location.reload();
-        }
-
-        // AKUN MANAGEMENT
-        let accounts = JSON.parse(localStorage.getItem('threadsAccounts')) || [];
+    // TAMBAH AKUN
+    document.getElementById('accountForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const session = document.getElementById('session').value;
         
-        document.getElementById('accountForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const session = document.getElementById('session').value;
-            
-            accounts.push({ username, session, status: 'active', proxy: 'auto', lastPost: null });
-            localStorage.setItem('threadsAccounts', JSON.stringify(accounts));
-            
-            document.getElementById('username').value = '';
-            document.getElementById('session').value = '';
-            loadAccounts();
-            updateStats();
-            
-            alert('✅ Akun ' + username + ' ditambahkan!');
+        accounts.push({
+            username, 
+            session, 
+            status: 'active', 
+            proxy: 'auto',
+            lastPost: null,
+            added: new Date().toISOString()
         });
+        
+        localStorage.setItem('threadsAccounts', JSON.stringify(accounts));
+        document.getElementById('username').value = '';
+        document.getElementById('session').value = '';
+        loadAccounts();
+        updateStats();
+        alert('✅ Akun ' + username + ' ditambahkan!');
+    });
 
-        function loadAccounts() {
-            const list = document.getElementById('accountsList');
-            list.innerHTML = '';
-            
-            accounts.forEach((account, index) => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center p-4 bg-gray-50 rounded-xl border-l-4 border-green-400';
-                div.innerHTML = `
-                    <div>
-                        <div class="font-bold text-lg">${account.username}</div>
-                        <div class="text-sm text-gray-600">Status: ${account.status} | Proxy: ${account.proxy}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-green-600 font-bold">✅ Active</div>
-                        <button onclick="deleteAccount(${index})" class="mt-1 bg-red-500 text-white px-4 py-1 rounded text-sm font-bold">Hapus</button>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-            
-            document.getElementById('totalAccounts').textContent = accounts.length;
-        }
+    // LOAD AKUN
+    function loadAccounts() {
+        const list = document.getElementById('accountsList');
+        list.innerHTML = '';
+        
+        accounts.forEach((account, index) => {
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center p-4 bg-gray-50 rounded-xl border-l-4 border-green-400 hover:bg-green-50';
+            div.innerHTML = `
+                <div class="flex-1">
+                    <div class="font-bold text-lg">${account.username}</div>
+                    <div class="text-sm text-gray-600">Status: ${account.status} | Proxy: ${account.proxy}</div>
+                </div>
+                <div class="text-right ml-4">
+                    <div class="text-sm text-green-600 font-bold mb-2">✅ Active</div>
+                    <button onclick="deleteAccount(${index})" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600">Hapus</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+        
+        document.getElementById('accountsCount').textContent = accounts.length;
+    }
 
-        function deleteAccount(index) {
+    function deleteAccount(index) {
+        if (confirm('Hapus akun ' + accounts[index].username + '?')) {
             accounts.splice(index, 1);
             localStorage.setItem('threadsAccounts', JSON.stringify(accounts));
             loadAccounts();
             updateStats();
         }
+    }
 
-        function updateStats() {
-            document.getElementById('totalAccounts').textContent = accounts.length;
-            document.getElementById('totalPosts').textContent = '60+';
-            document.getElementById('safetyScore').textContent = '95%';
-            document.getElementById('statusLog').textContent = accounts.length ? 'Cron OK' : 'Tambah akun';
-        }
-    </script>
+    // GITHUB SECRETS SYNC
+    function syncToGitHubSecrets() {
+        const jsonString = JSON.stringify(accounts, null, 2);
+        
+        const preview = document.createElement('div');
+        preview.className = 'fixed top-20 right-4 bg-emerald-600 text-white p-6 rounded-2xl shadow-2xl z-50 max-w-lg w-11/12 md:w-auto';
+        preview.innerHTML = `
+            <h4 class="font-bold text-xl mb-4">✅ SYNC ${accounts.length} AKUN KE GITHUB SECRETS</h4>
+            <div class="mb-4 text-sm bg-black bg-opacity-30 p-3 rounded-xl text-xs max-h-40 overflow-auto">
+                <pre>${jsonString}</pre>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="navigator.clipboard.writeText('${jsonString.replace(/'/g, "\\'")}');alert('✅ COPIED! Paste ke GitHub Secrets → THREADS_ACCOUNTS');this.parentElement.parentElement.remove();" 
+                        class="flex-1 bg-white text-emerald-600 py-3 px-4 rounded-lg font-bold text-sm hover:bg-gray-100">
+                    📋 COPY JSON
+                </button>
+                <button onclick="this.parentElement.parentElement.remove()" class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg font-bold text-sm hover:bg-gray-600">
+                    ✕ Tutup
+                </button>
+            </div>
+        `;
+        document.body.appendChild(preview);
+    }
+
+    function copyGitHubSecret() {
+        const jsonString = JSON.stringify(accounts);
+        navigator.clipboard.writeText(jsonString);
+        document.getElementById('syncStatus').textContent = '✅ JSON Copied!';
+        setTimeout(() => updateStats(), 2000);
+        alert(`✅ ${accounts.length} akun JSON copied!\nGitHub → Settings → Secrets → THREADS_ACCOUNTS → Paste!`);
+    }
+
+    function updateStats() {
+        document.getElementById('totalAccounts').textContent = accounts.length;
+        document.getElementById('totalPosts').textContent = accounts.length * 60;
+        document.getElementById('syncStatus').textContent = `${accounts.length} akun siap sync`;
+        document.getElementById('accountsCount').textContent = accounts.length;
+    }
+
+    // INIT STATS
+    updateStats();
+</script>
+
 </body>
-</html>
+                    </html>
+                    
