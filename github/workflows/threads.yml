@@ -24,3 +24,4 @@ jobs:
       env:
         THREADS_ACCOUNTS: ${{ secrets.THREADS_ACCOUNTS }}
       run: node scheduler.js
+      
