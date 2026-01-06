@@ -298,5 +298,120 @@
                 now.getHours() < 9 ? '09:00' : now.getHours() < 20 ? '20:00' : '09:00 Besok';
         }
     </script>
+    <!-- LOGIN MODAL USERNAME + PASSWORD -->
+<div id="loginModal" class="fixed inset-0 bg-black bg-opacity-75 z-[9999] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-8 text-center border-b border-gray-200">
+            <div class="w-20 h-20 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-2xl mx-auto mb-6 shadow-lg flex items-center justify-center">
+                <span class="text-3xl">🔐</span>
+            </div>
+            <h2 class="text-3xl font-black text-gray-800 mb-2">Threads Dashboard</h2>
+            <p class="text-lg text-gray-600">Masukkan kredensial untuk masuk</p>
+        </div>
+        
+        <form id="loginForm" class="p-8 space-y-6">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-3">👤 Username</label>
+                <input type="text" id="usernameInput" required
+                       class="w-full p-4 border-2 border-gray-200 rounded-xl text-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all" 
+                       placeholder="admin">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-3">🔑 Password</label>
+                <input type="password" id="passwordInput" required
+                       class="w-full p-4 border-2 border-gray-200 rounded-xl text-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all" 
+                       placeholder="• • • • • •">
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 px-6 rounded-xl text-lg shadow-xl hover:shadow-2xl transition-all">
+                    ✅ Masuk Dashboard
+                </button>
+                <button type="button" onclick="closeLogin()" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all">
+                    ❌ Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* LOCK BODY SAMPAI LOGIN */
+body.locked { overflow: hidden; }
+#loginModal.show { display: flex !important; }
+</style>
+
+<script>
+// KONFIGURASI LOGIN - GANTI SESUKA KAMU!
+const CREDENTIALS = {
+    'admin': 'threads2026admin',    // Username: admin | Password: threads2026admin
+    'threads': '50akun2026',        // Username: threads | Password: 50akun2026
+    'owner': 'supersecret123'       // Username: owner | Password: supersecret123
+};
+
+let isAuthenticated = localStorage.getItem('threadsAuth') === 'true';
+let authExpiry = localStorage.getItem('authExpiry');
+
+// CHECK LOGIN SAAT HALAMAN LOAD
+if (!isAuthenticated || !authExpiry || Date.now() > parseInt(authExpiry)) {
+    document.body.classList.add('locked');
+    document.getElementById('loginModal').classList.add('show');
+    document.body.style.display = 'none';
+} else {
+    document.body.style.display = 'block';
+}
+
+// LOGIN FORM
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('usernameInput').value;
+    const password = document.getElementById('passwordInput').value;
+    
+    // VALIDASI
+    if (CREDENTIALS[username] && CREDENTIALS[username] === password) {
+        // SUKSES - SIMPAN 7 HARI
+        localStorage.setItem('threadsAuth', 'true');
+        localStorage.setItem('authExpiry', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+        
+        document.getElementById('loginModal').classList.remove('show');
+        document.body.classList.remove('locked');
+        document.body.style.display = 'block';
+        
+        // RELOAD UNTUK RESET STATE
+        setTimeout(() => location.reload(), 300);
+        
+        showToast('✅ Selamat datang di Threads Dashboard!', 'success');
+    } else {
+        showToast('❌ Username atau password salah!', 'error');
+        document.getElementById('usernameInput').value = '';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('usernameInput').focus();
+    }
+});
+
+// CLOSE LOGIN (TANPA SIMPAN)
+function closeLogin() {
+    document.getElementById('loginModal').classList.remove('show');
+    document.body.classList.remove('locked');
+    document.body.style.display = 'block';
+}
+
+// LOGOUT BUTTON (TAMBAH DI DASHBOARD)
+function logout() {
+    localStorage.removeItem('threadsAuth');
+    localStorage.removeItem('authExpiry');
+    location.reload();
+}
+
+// AUTO LOGOUT 7 HARI
+setTimeout(() => {
+    if (localStorage.getItem('threadsAuth') === 'true') {
+        logout();
+        showToast('⏰ Session expired. Login ulang.', 'warning');
+    }
+}, 7 * 24 * 60 * 60 * 1000);
+</script>
 </body>
 </html>
