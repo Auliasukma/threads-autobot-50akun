@@ -1,39 +1,19 @@
-// GitHub Actions - JALAN OTOMATIS SETIAP HARI
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-
-async function postAllAccounts() {
+export default async function handler(req, res) {
+  try {
     const accounts = JSON.parse(process.env.THREADS_ACCOUNTS || '[]');
-    const proxies = await fetchProxies();
+    const results = [];
     
-    for (let i = 0; i < accounts.length; i++) {
-        const account = accounts[i];
-        const proxy = proxies[i % proxies.length];
-        
-        try {
-            // RANDOM HUMAN DELAY (1-5 menit)
-            await randomDelay(60000, 300000);
-            
-            await safePost(account, proxy);
-            console.log(`✅ ${account.username} posted via ${proxy}`);
-            
-        } catch (error) {
-            console.log(`❌ ${account.username} failed: ${error.message}`);
-        }
+    for (const account of accounts) {
+      const success = await safePost(account);
+      results.push({ username: account.username, success });
+      await new Promise(r => setTimeout(r, 120000 + Math.random() * 180000)); // 2-5 min delay
     }
+    
+    res.json({ success: true, results, total: results.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 }
-
-async function safePost(account, proxy) {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-            `--proxy-server=${proxy}`,
-            '--no-sandbox', '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage', '--disable-gpu',
-            `--user-agent=${randomUA()}`
-        ]
-    });
     
     const page = await browser.newPage();
     await page.setViewport({
